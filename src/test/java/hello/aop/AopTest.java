@@ -1,6 +1,6 @@
 package hello.aop;
 
-import hello.aop.order.aop.AspectV5Order;
+import hello.aop.order.aop.AspectV6Advice;
 import hello.aop.order.repository.OrderRepository;
 import hello.aop.order.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 
 @Slf4j
 @SpringBootTest
-@Import({AspectV5Order.LogAspect.class, AspectV5Order.TxAspect.class})
+@Import(AspectV6Advice.class)
 public class AopTest {
 
     @Autowired OrderService orderService;
@@ -25,8 +25,8 @@ public class AopTest {
         log.info("isAopProxy, orderRepository={}", AopUtils.isAopProxy(orderRepository));
 
         /**
-         * 2026-10-21T11:06:37.195+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.AopTest                        : isAopProxy, orderService=true
-         * 2026-10-21T11:06:37.195+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.AopTest                        : isAopProxy, orderRepository=true
+         * 2026-10-21T13:29:31.060+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.AopTest                        : isAopProxy, orderService=true
+         * 2026-10-21T13:29:31.060+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.AopTest                        : isAopProxy, orderRepository=false
          */
     }
 
@@ -35,13 +35,11 @@ public class AopTest {
         orderService.orderItem("itemA");
 
         /**
-         * 2026-10-21T11:06:37.186+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [트랜잭션 시작], void hello.aop.order.service.OrderService.orderItem(String)
-         * 2026-10-21T11:06:37.186+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [log] void hello.aop.order.service.OrderService.orderItem(String)
-         * 2026-10-21T11:06:37.186+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.service.OrderService     : [orderService] 실행
-         * 2026-10-21T11:06:37.187+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [log] String hello.aop.order.repository.OrderRepository.save(String)
-         * 2026-10-21T11:06:37.187+09:00  INFO 64045 --- [aop] [    Test worker] h.aop.order.repository.OrderRepository   : [orderRepository] 실행
-         * 2026-10-21T11:06:37.187+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [트랜잭션 커밋], void hello.aop.order.service.OrderService.orderItem(String)
-         * 2026-10-21T11:06:37.187+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [리소스 릴리즈], void hello.aop.order.service.OrderService.orderItem(String)
+         * 2026-10-21T13:29:31.055+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.order.aop.AspectV6Advice       : [before], void hello.aop.order.service.OrderService.orderItem(String)
+         * 2026-10-21T13:29:31.055+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.order.service.OrderService     : [orderService] 실행
+         * 2026-10-21T13:29:31.055+09:00  INFO 79637 --- [aop] [    Test worker] h.aop.order.repository.OrderRepository   : [orderRepository] 실행
+         * 2026-10-21T13:29:31.055+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.order.aop.AspectV6Advice       : [return] void hello.aop.order.service.OrderService.orderItem(String) return=null
+         * 2026-10-21T13:29:31.055+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.order.aop.AspectV6Advice       : [after] void hello.aop.order.service.OrderService.orderItem(String)
          */
     }
 
@@ -51,13 +49,16 @@ public class AopTest {
                 .isInstanceOf(IllegalStateException.class);
 
         /**
-         * 2026-10-21T11:06:37.210+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [트랜잭션 시작], void hello.aop.order.service.OrderService.orderItem(String)
-         * 2026-10-21T11:06:37.210+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [log] void hello.aop.order.service.OrderService.orderItem(String)
-         * 2026-10-21T11:06:37.210+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.service.OrderService     : [orderService] 실행
-         * 2026-10-21T11:06:37.210+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [log] String hello.aop.order.repository.OrderRepository.save(String)
-         * 2026-10-21T11:06:37.210+09:00  INFO 64045 --- [aop] [    Test worker] h.aop.order.repository.OrderRepository   : [orderRepository] 실행
-         * 2026-10-21T11:06:37.210+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [트랜잭션 롤백], void hello.aop.order.service.OrderService.orderItem(String)
-         * 2026-10-21T11:06:37.210+09:00  INFO 64045 --- [aop] [    Test worker] hello.aop.order.aop.AspectV5Order        : [리소스 릴리즈], void hello.aop.order.service.OrderService.orderItem(String)
+         * 2026-10-21T13:29:31.074+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.order.aop.AspectV6Advice       : [before], void hello.aop.order.service.OrderService.orderItem(String)
+         * 2026-10-21T13:29:31.074+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.order.service.OrderService     : [orderService] 실행
+         * 2026-10-21T13:29:31.075+09:00  INFO 79637 --- [aop] [    Test worker] h.aop.order.repository.OrderRepository   : [orderRepository] 실행
+         * 2026-10-21T13:29:31.075+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.order.aop.AspectV6Advice       : [ex] {} message={}
+         *
+         * java.lang.IllegalStateException: 예외 발생!
+         * 	at hello.aop.order.repository.OrderRepository.save(OrderRepository.java:15) ~[main/:na]
+         * 	at hello.aop.order.service.OrderService.orderItem(OrderService.java:18) ~[main/:na]
+         * 	...
+         * 2026-10-21T13:29:31.080+09:00  INFO 79637 --- [aop] [    Test worker] hello.aop.order.aop.AspectV6Advice       : [after] void hello.aop.order.service.OrderService.orderItem(String)
          */
     }
 }
